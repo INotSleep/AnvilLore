@@ -1,0 +1,4 @@
+name: AnvilLore
+version: '${version}'
+main: me.inotsleep.anvillore.AnvilLore
+api-version: '1.16'
