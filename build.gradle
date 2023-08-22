@@ -1,6 +1,19 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.johnrengelman:shadow:8.1.1"
+    }
+}
+
 plugins {
     id 'java'
 }
+
+apply plugin: "com.github.johnrengelman.shadow"
 
 group = 'me.inotsleep'
 version = '1.0'
@@ -15,10 +28,21 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
-compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
+    compileOnly "com.destroystokyo.paper:paper-api:1.16.5-R0.1-SNAPSHOT"
+    implementation(files("utils-0.1.jar"))
+    implementation("net.objecthunter:exp4j:0.4.8")
+    compileOnly "com.github.MilkBowl:VaultAPI:1.7"
+}
+
+shadowJar {
+    mergeServiceFiles("utils-0.1.jar")
+    dependencies {
+        include(dependency("net.objecthunter:exp4j:0.4.8"))
+    }
 }
 
 def targetJavaVersion = 8
@@ -32,9 +56,14 @@ java {
 }
 
 tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
     if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
         options.release = targetJavaVersion
     }
+}
+
+tasks.named("build") {
+    dependsOn(shadowJar)
 }
 
 processResources {
